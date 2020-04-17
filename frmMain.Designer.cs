@@ -74,7 +74,8 @@
             // lblInfo
             // 
             this.lblInfo.AutoSize = true;
-            this.lblInfo.Location = new System.Drawing.Point(26, 362);
+            this.lblInfo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            this.lblInfo.Location = new System.Drawing.Point(13, 84);
             this.lblInfo.Name = "lblInfo";
             this.lblInfo.Size = new System.Drawing.Size(0, 13);
             this.lblInfo.TabIndex = 3;
@@ -112,7 +113,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(29)))), ((int)(((byte)(170)))), ((int)(((byte)(225)))));
-            this.ClientSize = new System.Drawing.Size(732, 77);
+            this.ClientSize = new System.Drawing.Size(731, 106);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtIP);
             this.Controls.Add(this.btnClose);

@@ -13,12 +13,27 @@ namespace EasyFileTransfer
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new frmMain());
-            
+
+            // test if this is the first instance and register receiver, if so.
+            if (SingletonController.IamFirst(new SingletonController.ReceiveDelegate(SecondRun)))
+            {
+                Application.Run(new frmMain(args,new FileTransfer(true)));
+            }
+            else
+            {
+                // send command line args to running app, then terminate
+                SingletonController.Send(args);
+            }
+            SingletonController.Cleanup();
+        }
+
+        private static void SecondRun(string[] args)
+        {
+            new FileTransfer(false).Send(args[0]);
         }
     }
 }
