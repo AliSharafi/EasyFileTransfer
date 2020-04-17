@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EasyFileTransfer.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,7 +22,10 @@ namespace EasyFileTransfer
             // test if this is the first instance and register receiver, if so.
             if (SingletonController.IamFirst(new SingletonController.ReceiveDelegate(SecondRun)))
             {
+                WindowsContextMenu.Add("Send To Server");
                 Application.Run(new frmMain(args,new FileTransfer(true)));
+                
+
             }
             else
             {

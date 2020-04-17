@@ -126,7 +126,7 @@ namespace EasyFileTransfer
             }
             else
             {
-                InfoLabel.Invoke(new ReceiveDelegate(LabelWriter));
+                //InfoLabel.Invoke(new ReceiveDelegate(LabelWriter));
             }
         }
         public void LabelWriter()

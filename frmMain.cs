@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using EasyFileTransfer.Utils;
 
 namespace EasyFileTransfer
 {
@@ -20,49 +21,35 @@ namespace EasyFileTransfer
 
         #region fields
         FileTransfer _fileTransfer;
+        string _selectedFile;
         #endregion
 
-        public frmMain(string[] args,FileTransfer ft)
-        {
+
+        #region Form event handlers
+        public frmMain(string[] args, FileTransfer ft)
+        { 
             InitializeComponent();
 
-            _fileTransfer = ft;
-            _fileTransfer.InfoLabel = lblInfo;
+            // Place th form bottom right
+            Rectangle workingArea = Screen.GetWorkingArea(this);
+            this.Location = new Point(workingArea.Right - Size.Width,
+                                      workingArea.Bottom - Size.Height);
 
+            //This object initiates from program.Main()
+            _fileTransfer = ft;
+
+           // WindowsContextMenu.Add("Send To Server");
+
+            //Running from explorer context menu
             if (args.Length > 0)
             {
-                txtFileName.Text = args[0];
+                _selectedFile = args[0];
                 DoSend();
             }
         }
-
-        #region Form event handlers
-        private void btnOpenDialog_Click(object sender, EventArgs e)
-        {
-            // Show the open file dialog to select our data.
-            openFileDialog1.ShowDialog();
-
-            //Get the file name and write it into our text box.
-            txtFileName.Text = openFileDialog1.FileName;
-
-            if (txtFileName.Text != null)
-                btnSend.Enabled = true;
-        }
-        private void btnSend_Click(object sender, EventArgs e)
-        {
-            DoSend();
-        }
-        private void btnClose_Click(object sender, EventArgs e)
-        {
-            Application.Exit();
-        }
-
-        private void txtIP_TextChanged(object sender, EventArgs e)
-        {
-            _fileTransfer._serverIP = txtIP.Text;
-        }
         private void frmMain_FormClosed(object sender, FormClosedEventArgs e)
         {
+            WindowsContextMenu.Remove("Send To Server");
             _fileTransfer.Stop();
         }
         #endregion
@@ -70,10 +57,12 @@ namespace EasyFileTransfer
         #region Send File
         private void DoSend()
         {
-            lblInfo.Text = "sending";
+            if (string.IsNullOrEmpty(_selectedFile))
+                return;
+
             try
             {
-                _fileTransfer.Send(txtFileName.Text);
+                _fileTransfer.Send(_selectedFile);
             }
             catch (Exception ex)
             {
@@ -97,8 +86,33 @@ namespace EasyFileTransfer
                 SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
             }
         }
+
         #endregion
 
+        #region Context menu
+        private void sendToServerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Show the open file dialog to select our data.
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+                _selectedFile = openFileDialog1.FileName;
 
+            DoSend();
+        }
+        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmSettings settings = new FrmSettings();
+            settings.Show();
+        }
+        private void closeToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+        #endregion
+
+       
     }
 }
