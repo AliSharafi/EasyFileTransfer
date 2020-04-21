@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,7 +41,7 @@ namespace EasyFileTransfer
         #region Send File
         public void Send(string FilePath)
         {
-            string _fName = Path.GetFileName(FilePath);
+            string _fName = string.Concat(Path.GetFileName(FilePath), "■", WindowsIdentity.GetCurrent().Name); // append username to filename 
             Socket clientSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             byte[] fileName = Encoding.UTF8.GetBytes(_fName); //file name

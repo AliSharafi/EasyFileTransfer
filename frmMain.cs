@@ -18,12 +18,10 @@ namespace EasyFileTransfer
     public partial class frmMain : Form
     {
 
-
         #region fields
         FileTransfer _fileTransfer;
         string _selectedFile;
         #endregion
-
 
         #region Form event handlers
         public frmMain(string[] args, FileTransfer ft)
@@ -113,6 +111,5 @@ namespace EasyFileTransfer
         }
         #endregion
 
-       
     }
 }
