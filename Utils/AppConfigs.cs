@@ -5,55 +5,72 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Configuration;
 using System.ComponentModel;
+using System.Web.Script.Serialization;
 
 namespace EasyFileTransfer.Utils
 {
     public class AppConfigs
     {
-        [Category("Client Settings")]
-        [Description("Where to save files that server sends to me?")]
+
+        string _savePath;
         public string SavePath
         {
             get
             {
-                return ConfigurationManager.AppSettings["SavePath"]; 
+                return _savePath;
             }
             set
             {
-                AddOrUpdateAppSettings("SavePath", value);
+                _savePath = value;
             }
         }
-        [Category("Client Settings")]
-        [Description("Server IP address ")]
+
+        string _serverIP;
         public string ServerIP
         {
             get
             {
-                return ConfigurationManager.AppSettings["ServerIP"];
+                return _serverIP;
             }
             set
             {
-                AddOrUpdateAppSettings("ServerIP", value);
+                _serverIP = value;
             }
         }
 
-
-        Dictionary<string, string> _test = new Dictionary<string, string>();
-
-        public Dictionary<string, string> Test
+        string _domainUsername;
+        public string DomainUsername
         {
             get
             {
-                
-                return _test;
+                return _domainUsername;
             }
             set
             {
-                _test = value;
+                _domainUsername = value;
             }
         }
 
-        void AddOrUpdateAppSettings(string key, string value)
+        public static AppConfigs Load()
+        {
+            JavaScriptSerializer _serializer = new JavaScriptSerializer();
+
+            var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            var settings = configFile.AppSettings.Settings;
+            if (settings["AppConfigs"] != null && settings["AppConfigs"].Value != "")
+            {
+                return (AppConfigs)_serializer.Deserialize(settings["AppConfigs"].Value, typeof(AppConfigs));
+            }
+            return new AppConfigs();
+        }
+
+        public static void Save(AppConfigs conf)
+        {
+            JavaScriptSerializer _serializer = new JavaScriptSerializer();
+            AddOrUpdateAppSettings("AppConfigs", _serializer.Serialize(conf));
+        }
+
+        static void AddOrUpdateAppSettings(string key, string value)
         {
             try
             {
@@ -72,7 +89,7 @@ namespace EasyFileTransfer.Utils
             }
             catch (ConfigurationErrorsException)
             {
-                Console.WriteLine("Error writing app settings");
+               
             }
         }
     }

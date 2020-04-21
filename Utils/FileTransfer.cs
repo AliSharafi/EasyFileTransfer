@@ -9,17 +9,18 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using EasyFileTransfer.Utils;
 
 namespace EasyFileTransfer
 {
     public class FileTransfer
     {
         #region Constants
-        const int _port = 2345;
+        const int _portReceive = 2346;
+        const int _portSend = 2345;
         #endregion
 
         #region fields
-        public string _serverIP = "127.0.0.1";
         Thread _listenThread;
         public Label InfoLabel;
         int _flag = 0;
@@ -41,7 +42,7 @@ namespace EasyFileTransfer
         #region Send File
         public void Send(string FilePath)
         {
-            string _fName = string.Concat(Path.GetFileName(FilePath), "■", WindowsIdentity.GetCurrent().Name); // append username to filename 
+            string _fName = string.Concat(Path.GetFileName(FilePath), "■", AppConfigs.Load().DomainUsername); // append username to filename 
             Socket clientSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             byte[] fileName = Encoding.UTF8.GetBytes(_fName); //file name
@@ -54,7 +55,7 @@ namespace EasyFileTransfer
             fileName.CopyTo(m_clientData, 4);
             fileData.CopyTo(m_clientData, 4 + fileName.Length);
 
-            clientSock.Connect(_serverIP, _port); //target machine's ip address and the port number
+            clientSock.Connect(AppConfigs.Load().ServerIP, _portSend); //target machine's ip address and the port number
             clientSock.Send(m_clientData);
             clientSock.Close();
         }
@@ -64,7 +65,7 @@ namespace EasyFileTransfer
         private void StartListening()
         {
             //byte[] bytes = new Byte[1024];
-            IPEndPoint ipEnd = new IPEndPoint(IPAddress.Any, _port);
+            IPEndPoint ipEnd = new IPEndPoint(IPAddress.Any, _portReceive);
             Socket listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             try
             {

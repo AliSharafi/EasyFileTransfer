@@ -17,7 +17,6 @@ namespace EasyFileTransfer
 {
     public partial class frmMain : Form
     {
-
         #region fields
         FileTransfer _fileTransfer;
         string _selectedFile;
@@ -110,6 +109,5 @@ namespace EasyFileTransfer
             Application.Exit();
         }
         #endregion
-
     }
 }
