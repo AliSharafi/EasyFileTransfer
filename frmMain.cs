@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using EasyFileTransfer.Utils;
+using WK.Libraries.SharpClipboardNS;
 
 namespace EasyFileTransfer
 {
@@ -43,7 +44,20 @@ namespace EasyFileTransfer
                 _selectedFile = args[0];
                 DoSend();
             }
+
+            var clipboard = new SharpClipboard();
+            clipboard.ClipboardChanged += Clipboard_ClipboardChanged;
+
         }
+
+        private void Clipboard_ClipboardChanged(object sender, SharpClipboard.ClipboardChangedEventArgs e)
+        {
+            if (e.ContentType == SharpClipboard.ContentTypes.Text && e.Content.ToString().Trim() != "")
+            {
+                FrmClipboard.GetForm(e.Content.ToString()).Show();
+            }
+        }
+
         private void frmMain_FormClosed(object sender, FormClosedEventArgs e)
         {
             WindowsContextMenu.Remove("Send To Server");
