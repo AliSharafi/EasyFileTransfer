@@ -22,7 +22,7 @@ namespace EasyFileTransfer
 
         #region fields
         Thread _listenThread;
-        public Label InfoLabel;
+        public CircularProgressBar.CircularProgressBar pb;
         int _flag = 0;
         string _receivedPath;
         public delegate void ReceiveDelegate();
@@ -97,6 +97,8 @@ namespace EasyFileTransfer
         }
         public void ReadCallback(IAsyncResult ar)
         {
+            pb.Invoke(new ReceiveDelegate(pbShow));
+
             int fileNameLen = 1;
             String content = String.Empty;
             StateObject state = (StateObject)ar.AsyncState;
@@ -128,12 +130,16 @@ namespace EasyFileTransfer
             }
             else
             {
-                //InfoLabel.Invoke(new ReceiveDelegate(LabelWriter));
+                pb.Invoke(new ReceiveDelegate(pbHide));
             }
         }
-        public void LabelWriter()
+        public void pbShow()
         {
-            InfoLabel.Text = "Data has been received";
+            pb.Visible = true;
+        }
+        public void pbHide()
+        {
+            pb.Visible = false;
         }
         #endregion
 

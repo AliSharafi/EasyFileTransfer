@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -21,11 +22,13 @@ namespace EasyFileTransfer
         #region fields
         FileTransfer _fileTransfer;
         string _selectedFile;
+
+        
         #endregion
 
         #region Form event handlers
         public frmMain(string[] args, FileTransfer ft)
-        { 
+        {
             InitializeComponent();
 
             // Place th form bottom right
@@ -36,7 +39,7 @@ namespace EasyFileTransfer
             //This object initiates from program.Main()
             _fileTransfer = ft;
 
-           // WindowsContextMenu.Add("Send To Server");
+            // WindowsContextMenu.Add("Send To Server");
 
             //Running from explorer context menu
             if (args.Length > 0)
@@ -48,6 +51,8 @@ namespace EasyFileTransfer
             var clipboard = new SharpClipboard();
             clipboard.ClipboardChanged += Clipboard_ClipboardChanged;
 
+
+            StartWatching();
         }
 
         private void Clipboard_ClipboardChanged(object sender, SharpClipboard.ClipboardChangedEventArgs e)
@@ -123,5 +128,6 @@ namespace EasyFileTransfer
             Application.Exit();
         }
         #endregion
+       
     }
 }

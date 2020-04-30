@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,12 +23,12 @@ namespace EasyFileTransfer
             {
                 inst = new FrmClipboard();
             }
-            inst.Text = Text;
+            inst.TextToShow = Text;
             return inst;
         }
         #endregion
 
-        public string Text
+        public string TextToShow
         {
             get
             {
@@ -35,10 +36,12 @@ namespace EasyFileTransfer
             }
             set
             {
-                txtClipboard.Text = value;
+                txtClipboard.Invoke(new Action(() => txtClipboard.Text = value));
             }
         }
-        public FrmClipboard ()
+
+
+        public FrmClipboard()
         {
             InitializeComponent();
 
@@ -56,6 +59,22 @@ namespace EasyFileTransfer
 
         private void btnSend_Click(object sender, EventArgs e)
         {
+            try
+            {
+                string path = string.Concat(Directory.GetCurrentDirectory() + "\\clipboard.txt");
+                File.Delete(path);
+                using (StreamWriter sw = File.CreateText(path))
+                {
+                    sw.Write(txtClipboard.Text);
+                }
+
+                FileTransfer _ft = new FileTransfer(false);
+                _ft.Send(path);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             Close();
         }
     }
