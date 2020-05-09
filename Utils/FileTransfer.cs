@@ -110,12 +110,12 @@ namespace EasyFileTransfer
                 {
                     fileNameLen = BitConverter.ToInt32(state.buffer, 0);
                     string fileName = Encoding.UTF8.GetString(state.buffer, 4, fileNameLen);
-                    _receivedPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + fileName;
+                    _receivedPath = AppConfigs.Load().SavePath + "\\" + fileName;
                     _flag++;
                 }
                 if (_flag >= 1)
                 {
-                    BinaryWriter writer = new BinaryWriter(File.Open(_receivedPath , FileMode.Append));
+                    BinaryWriter writer = new BinaryWriter(File.Open(_receivedPath , FileMode.Create));
                     if (_flag == 1)
                     {
                         writer.Write(state.buffer, 4 + fileNameLen, bytesRead - (4 + fileNameLen));

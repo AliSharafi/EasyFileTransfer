@@ -22,8 +22,7 @@ namespace EasyFileTransfer
         #region fields
         FileTransfer _fileTransfer;
         string _selectedFile;
-
-        
+        FileSystemWatcher watcher;
         #endregion
 
         #region Form event handlers
@@ -38,6 +37,7 @@ namespace EasyFileTransfer
 
             //This object initiates from program.Main()
             _fileTransfer = ft;
+            _fileTransfer.pb = this.pb;
 
             // WindowsContextMenu.Add("Send To Server");
 
@@ -55,11 +55,79 @@ namespace EasyFileTransfer
             StartWatching();
         }
 
+        private void StartWatching()
+        {
+
+            watcher = new FileSystemWatcher();
+            watcher.Path = string.Concat(AppConfigs.Load().SavePath, "\\");
+            watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.LastAccess | NotifyFilters.CreationTime | NotifyFilters.FileName;
+            watcher.Filter = "clipboard_ServerToClient.txt";
+
+            watcher.Created += Watcher_Created;
+            watcher.Changed += Watcher_Created;
+
+            watcher.EnableRaisingEvents = true;
+        }
+
+        DateTime lastRead = DateTime.MinValue;
+        private void Watcher_Created(object sender, FileSystemEventArgs e)
+        {
+            try
+            {
+                DateTime lastWriteTime = File.GetLastWriteTime(e.FullPath);
+                if (lastWriteTime != lastRead)
+                {
+                    Thread.Sleep(100);
+                    string Content = "";
+                    using (StreamReader sr = new StreamReader(File.Open(e.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read)))
+                    {
+                        string s = "";
+                        while ((s = sr.ReadLine()) != null)
+                        {
+                            Content += s + Environment.NewLine;
+                        }
+                    }
+                    lastRead = lastWriteTime;
+
+                    FrmClipboard f = FrmClipboard.GetForm(Content);
+                    if (f.IsHandleCreated)
+                    {
+                        f.Invoke(new MethodInvoker(delegate ()
+                        {
+                            f.ShowDialog();
+                        }));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+#if DEBUG
+                using (EventLog eventLog = new EventLog("Application"))
+                {
+                    eventLog.Source = "EFTServer";
+                    eventLog.WriteEntry("Watcher_Created : " + ex.Message, EventLogEntryType.Error, 101, 1);
+                }
+#endif
+            }
+        }
+
         private void Clipboard_ClipboardChanged(object sender, SharpClipboard.ClipboardChangedEventArgs e)
         {
-            if (e.ContentType == SharpClipboard.ContentTypes.Text && e.Content.ToString().Trim() != "")
+            try
             {
-                FrmClipboard.GetForm(e.Content.ToString()).Show();
+                if (e.ContentType == SharpClipboard.ContentTypes.Text && e.Content.ToString().Trim() != "")
+                {
+                    //FrmClipboard f = 
+                    FrmClipboard.GetForm(e.Content.ToString()).Show();
+                    //f.Invoke(new MethodInvoker(delegate ()
+                    //{
+                    //    f.ShowDialog();
+                    //}));
+                }
+            }
+            catch(Exception ex)
+            {
+
             }
         }
 
@@ -128,6 +196,6 @@ namespace EasyFileTransfer
             Application.Exit();
         }
         #endregion
-       
+
     }
 }

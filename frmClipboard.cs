@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using EasyFileTransfer.Utils;
+using System.Threading;
 
 namespace EasyFileTransfer
 {
@@ -36,7 +37,8 @@ namespace EasyFileTransfer
             }
             set
             {
-                txtClipboard.Invoke(new Action(() => txtClipboard.Text = value));
+                txtClipboard.Text = value;
+                //txtClipboard.Invoke(new Action(() => txtClipboard.Text = value));
             }
         }
 
@@ -54,7 +56,9 @@ namespace EasyFileTransfer
 
         private void btnClose_Click(object sender, EventArgs e)
         {
+
             Close();
+            Dispose();
         }
 
         private void btnSend_Click(object sender, EventArgs e)
